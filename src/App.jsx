@@ -1,22 +1,29 @@
 import { useEffect, useState } from 'react'
 import Pusher from 'pusher-js';
-const pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
-  cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-});
 
 function App() {
   const [connectionState, setConnectionState] = useState('not-connected')
   const [messageToBeSent, setMessageToBeSent] = useState('')
   const [messages, setMessages] = useState([])
+  const [user, setUser] = useState()
+
+  const randomUser = Math.random().toString(20).substring(2,8)
+  const randomOtherUser = Math.random().toString(20).substring(2,8)
+  const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+    channelAuthorization: {
+      endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL + `/${randomUser}/${randomOtherUser}`
+    }
+  });
 
   useEffect(() => {
     console.log('henlo');
-    console.log(pusher);
-    initConversations()
+    console.log(pusherClient);
+    pusherBindEvents()
   }, [])
 
-  const initConversations = async () => {
-    var channel = pusher.subscribe("my-channel");
+  const pusherBindEvents = async () => {
+    var channel = pusherClient.subscribe("presence-my-channel");
     channel.bind("my-event", (data) => {
       console.log(data);
     });
