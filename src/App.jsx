@@ -2,26 +2,27 @@ import { useEffect, useState } from 'react'
 import Pusher from 'pusher-js';
 
 function App() {
-  const [connectionState, setConnectionState] = useState('not-connected')
   const [messageToBeSent, setMessageToBeSent] = useState('')
-  const [messages, setMessages] = useState([])
-  const [user, setUser] = useState()
+  const [appUserMessages, setAppUserMessages] = useState([])
+  const [proMessages, setProMessages] = useState([])
 
-  const appUserId = 'usr_56913465891350'
+  const appUserId = 'usr_56913465891340'
   const professionalId = 'pro_hn9a8wdh89ahd'
-  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxMjMxMjU3LCJleHAiOjE3MzM4MjMyNTd9.f9i82nigIRo1t3oBtdQSdQI-rgxtxWCcmCgAAKTDAYg"
-  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxMjMxMjU3LCJleHAiOjE3MzM4MjMyNTd9.f9i82nigIRo1t3oBtdQSdQI-rgxtxWCcmCgAAKTDAYg"
+  const usertype = 'APPUSER'
+  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxMzAwNTA5LCJleHAiOjE3MzM4OTI1MDl9.8LJZhK5SlAj4MueEQzLl0WzyWwQHqQy4Wa_DIQMEofI"
+  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwiaWF0IjoxNzMxMzg2NTMxLCJleHAiOjE3MzM5Nzg1MzF9.PECQijHEfxXE1In0kdFDB8xPHmXF8rqz1hMkW1PlAto"
   const connectionUniqueId = 'con_0B4PIHjbYn'
   const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     channelAuthorization: {
-      endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL + `${appUserId}/${professionalId}`
+      endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL + `${usertype}/${appUserId}/${professionalId}`
     }
   });
 
   useEffect(() => {
     console.log('henlo');
     getMessagesForAppUser()
+    getMessagesForPro()
     console.log(pusherClient);
     pusherBindEvents()
     return (() => {
@@ -29,8 +30,27 @@ function App() {
     })
   }, [])
 
+  const pusherBindEvents = async () => {
+    console.log('bound');
+    var channel = pusherClient.subscribe(`presence-pro-connection-chat-${connectionUniqueId}`);
+
+    channel.bind("pusher:subscription_succeeded", (members) => {
+      members.each((member) => {
+        console.log('member', member)
+      });
+    });
+    channel.bind("pusher:subscription_error", (data) => {
+        console.log('subscription_error', data)
+    });
+    channel.bind("send-connection-message", (data) => {
+      setAppUserMessages(prevMessages => [data, ...prevMessages]) // FOR APP USERS
+      setProMessages(prevMessages => [data, ...prevMessages]) // FOR PROS
+    });
+  };
+
+  // FOR APP USERS
   const getMessagesForAppUser = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/professionals/get_connection_chat_messages_as_user/pro_hn9a8wdh89ahd`, {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/app/professionals/get_connection_chat_messages_as_user/` + professionalId, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${appUserAuthToken}`
@@ -38,32 +58,12 @@ function App() {
       }
     )
     const data = await response.json()
-    setMessages(data.data.chat_messages)
-
-    console.log('appUser msg data', data, 'app_User messages', messages);
+    setAppUserMessages(data.data.chat_messages)
   }
 
-  const pusherBindEvents = async () => {
-    console.log('bound');
-    var channel = pusherClient.subscribe(`presence-pro-connection-chat-${connectionUniqueId}`);
-
-    channel.bind("pusher:subscription_succeeded", (members) => {
-      members.each((member) => {
-        console.log(member)
-      });
-    });
-    channel.bind("pusher:subscription_error", (data) => {
-        console.log('subscription_error', data)
-    });
-    channel.bind("send-connection-message", (data) => {
-      console.log('send-connection-message', data);
-      setMessages(prevMessages => [...prevMessages, data])
-      console.log('All messages', messages);
-    });
-  };
-
+  // FOR APP USERS
   const sendMessageToPro = async () => {
-    await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/professionals/send_message_to_professional/` + professionalId, {
+    await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/app/professionals/send_message_to_professional/` + professionalId, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,38 +71,66 @@ function App() {
       },
       body:JSON.stringify({ message: messageToBeSent })
     })
-
     setMessageToBeSent('')
     console.log('sent');
   }
 
+  // FOR PROS
+  const getMessagesForPro = async () => {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/professionals/get_connection_chat_messages_as_admin/` + appUserId, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${proAuthToken}`
+        },
+      }
+    )
+    const data = await response.json()
+    setProMessages(data.data.chat_messages)
+  }
+
+  // FOR PROS
   const sendMessageToAppUser = async () => {
     await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/professionals/send_message_to_app_user/` + appUserId, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${appUserAuthToken}`
+        Authorization: `Bearer ${proAuthToken}`
       },
       body:JSON.stringify({ message: messageToBeSent })
     })
-
     setMessageToBeSent('')
     console.log('sent');
   }
 
   return (
     <>
-      Connection State: {connectionState}
-      <br />
-      allMessages: {messages.map((msg, index) => {
-        return <div key={index}>
-          <p>{msg.message}</p>
+      <div style={{ display: "flex" }}>
+        {/* FOR APP USERS */}
+        <div style={{ padding: "25px", borderRightStyle: 'solid', borderRightColor: 'white', borderRightWidth: 2 }}>
+          <h6> all App User Messages: </h6>
+          {appUserMessages.map((msg, index) => {
+            return <div key={index}>
+              <p>{msg.message}</p>
+            </div>
+          })}
         </div>
-      })}
+        {/* FOR PROS */}
+        <div style={{ padding: "25px" }}>
+          <h6> all Pro Messages: </h6>
+          {proMessages.map((msg, index) => {
+            return <div key={index}>
+              <p>{msg.message}</p>
+            </div>
+          })}
+        </div>
+      </div>
       <br />
       <input type="text" onChange={(e) => setMessageToBeSent(e.target.value)} value={messageToBeSent} />
       <br />
+      <br />
       <button type="button" onClick={sendMessageToPro}>Send Message To Pro</button>
+      <br />
+      <br />
       <button type="button" onClick={sendMessageToAppUser}>Send Message To User</button>
     </>
   )
