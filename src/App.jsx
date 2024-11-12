@@ -5,17 +5,22 @@ function App() {
   const [messageToBeSent, setMessageToBeSent] = useState('')
   const [appUserMessages, setAppUserMessages] = useState([])
   const [proMessages, setProMessages] = useState([])
+  const [otherPersonIsOnline, setOtherPersonIsOnline] = useState(false)
+  const [statusMessage, setStatusMessage] = useState()
 
   const appUserId = 'usr_56913465891340'
   const professionalId = 'pro_hn9a8wdh89ahd'
-  const usertype = 'APPUSER' // 'APPUSER'|'PROFESSIONAL'
+  // const usertype = 'APPUSER' // 'APPUSER'|'PROFESSIONAL'
+  const urlParams = new URLSearchParams(window.location.search);
+  const usertype = urlParams.get('usertype'); // 'APPUSER'|'PROFESSIONAL'
+  console.log(usertype);
   const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxMzAwNTA5LCJleHAiOjE3MzM4OTI1MDl9.8LJZhK5SlAj4MueEQzLl0WzyWwQHqQy4Wa_DIQMEofI"
   const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwiaWF0IjoxNzMxMzg2NTMxLCJleHAiOjE3MzM5Nzg1MzF9.PECQijHEfxXE1In0kdFDB8xPHmXF8rqz1hMkW1PlAto"
   const connectionUniqueId = 'con_0B4PIHjbYn'
   const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     channelAuthorization: {
-      endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL + `${usertype}/${appUserId}/${professionalId}`
+      endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL + `/${usertype}/${appUserId}/${professionalId}`
     }
   });
 
@@ -35,9 +40,21 @@ function App() {
     var channel = pusherClient.subscribe(`presence-pro-connection-chat-${connectionUniqueId}`);
 
     channel.bind("pusher:subscription_succeeded", (members) => {
+      console.log('all members details', members.count, members);
+      if(members.count === 2)
+        setOtherPersonIsOnline(true)
+      // LIST OF JOINED MEMBERS
       members.each((member) => {
         console.log('member', member)
       });
+    });
+    channel.bind("pusher:member_added", (member) => {
+      setStatusMessage(`${member.info.username} has joined the chat`)
+      setOtherPersonIsOnline(true)
+    });
+    channel.bind("pusher:member_removed", (member) => {
+      setStatusMessage(`${member.info.username} has left the chat`)
+      setOtherPersonIsOnline(false)
     });
     channel.bind("pusher:subscription_error", (data) => {
         console.log('subscription_error', data)
@@ -104,7 +121,10 @@ function App() {
 
   return (
     <>
+      <h5>{statusMessage ? statusMessage : ''}</h5>
+      <h5>{otherPersonIsOnline ? 'Other person is online' : 'Other person is offline'}</h5>
       <div style={{ display: "flex" }}>
+        <br />
         {/* FOR APP USERS */}
         <div style={{ padding: "25px", borderRightStyle: 'solid', borderRightColor: 'white', borderRightWidth: 2 }}>
           <h6> all App User Messages: </h6>
