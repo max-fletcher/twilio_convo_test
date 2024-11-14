@@ -6,7 +6,7 @@ function App() {
   const [appUserMessages, setAppUserMessages] = useState([])
   const [proMessages, setProMessages] = useState([])
   const [otherPersonIsOnline, setOtherPersonIsOnline] = useState(false)
-  const [statusMessage, setStatusMessage] = useState()
+  const [statusMessage, setStatusMessage] = useState(null)
 
   const appUserId = 'usr_56913465891340'
   const professionalId = 'pro_hn9a8wdh89ahd'
@@ -148,10 +148,10 @@ function App() {
       <input type="text" onChange={(e) => setMessageToBeSent(e.target.value)} value={messageToBeSent} />
       <br />
       <br />
-      <button type="button" onClick={sendMessageToPro}>Send Message To Pro</button>
+      {usertype === "APPUSER" && <button type="button" onClick={sendMessageToPro}>Send Message To Pro</button>}
       <br />
       <br />
-      <button type="button" onClick={sendMessageToAppUser}>Send Message To User</button>
+      {usertype === "PROFESSIONAL" && <button type="button" onClick={sendMessageToAppUser}>Send Message To User</button>}
     </>
   )
 }
