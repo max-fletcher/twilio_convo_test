@@ -60,8 +60,8 @@ function App() {
         console.log('subscription_error', data)
     });
     channel.bind("send-connection-message", (data) => {
-      setAppUserMessages(prevMessages => [data, ...prevMessages]) // FOR APP USERS
-      setProMessages(prevMessages => [data, ...prevMessages]) // FOR PROS
+      setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
+      setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
     });
   };
 
