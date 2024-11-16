@@ -8,15 +8,14 @@ function App() {
   const [otherPersonIsOnline, setOtherPersonIsOnline] = useState(false)
   const [statusMessage, setStatusMessage] = useState(null)
 
-  const appUserId = 'usr_56913465891340'
-  const professionalId = 'pro_hn9a8wdh89ahd'
+  const appUserId = 'usr_56913465891350'
+  const professionalId = 'pro_jadjha98w'
   // const usertype = 'APPUSER' // 'APPUSER'|'PROFESSIONAL'
   const urlParams = new URLSearchParams(window.location.search);
   const usertype = urlParams.get('usertype'); // 'APPUSER'|'PROFESSIONAL'
-  console.log(usertype);
-  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxMzAwNTA5LCJleHAiOjE3MzM4OTI1MDl9.8LJZhK5SlAj4MueEQzLl0WzyWwQHqQy4Wa_DIQMEofI"
-  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwiaWF0IjoxNzMxMzg2NTMxLCJleHAiOjE3MzM5Nzg1MzF9.PECQijHEfxXE1In0kdFDB8xPHmXF8rqz1hMkW1PlAto"
-  const connectionUniqueId = 'con_0B4PIHjbYn'
+  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM1MCIsIm5hbWUiOm51bGwsInVzZXJuYW1lIjoiVXNlciAyIiwiZW1haWwiOiJ1c2VyMkBtYWlsLmNvbSIsInBob25lIjoiMjM0NTY3ODkiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzMxNjgwNjkzLCJleHAiOjE3MzQyNzI2OTN9.nfJHk36vdGZOB7p5A_avgn_RXzA7Nr-J582l1idBbu4"
+  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAZXhhbXBsZS5jb20iLCJpZCI6IjMiLCJ1c2VyVHlwZSI6IlBST0ZFU1NJT05BTCIsImlhdCI6MTczMTc0MzQwNywiZXhwIjoxNzM0MzM1NDA3fQ.IF4udDDo1zdYpSF8s96_oqu6VXo7o4L5QHjk97uoDOg"
+  const connectionUniqueId = 'con_FVXF7WP9ub'
   const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     channelAuthorization: {
@@ -62,7 +61,7 @@ function App() {
     channel.bind("send-connection-message", (data) => {
       setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
       setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
-    });
+    })
   };
 
   // FOR APP USERS
