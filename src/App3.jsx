@@ -8,31 +8,29 @@ function App() {
   const [proIsOnline, setProIsOnline] = useState(false)
   const [userIsOnline, setUserIsOnline] = useState(false)
   const [statusMessage, setStatusMessage] = useState(null)
-  const [toProChannel, setToProChannel]=useState(null)
-  const [toUserChannel, setToUserChannel]=useState(null)
+  const [proChannel, setProChannel]=useState(null)
+  const [userChannel, setUserChannel]=useState(null)
 
   const appUserId = 'usr_56913465891340'
-  const professionalId = 'pro_hn9a8wdh89ahd'
+  const professionalId = 'pro_jadjha98w'
   // const usertype = 'APPUSER' // 'APPUSER'|'PROFESSIONAL'
   const urlParams = new URLSearchParams(window.location.search);
   const usertype = urlParams.get('usertype'); // 'APPUSER'|'PROFESSIONAL'
-  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxODM0NjYyLCJleHAiOjE3MzQ0MjY2NjJ9.mpPdVPah8UoHhuWWeQ23l_hmzzGmBDKXID-FECXzJPE"
-  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwiaWF0IjoxNzMxODM0NzExLCJleHAiOjE3MzQ0MjY3MTF9.RpxP44fNNb2n6wu2cIV_iuZmBz8EGCtD1cGziDU6le4"
-  const connectionUniqueId = 'con_0B4PIHjbYn'
+  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOm51bGwsInVzZXJuYW1lIjoiZmxldGNoZXIiLCJlbWFpbCI6Im1haGluLmNob3dkaHVyeS4xOTkxQGdtYWlsLmNvbSIsInBob25lIjoiKzg4MDE3NjIyMTQzMTUiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0Ijp0cnVlLCJpYXQiOjE3MzE4NjAzOTksImV4cCI6MTczNDQ1MjM5OX0.fnfu3E3g5W2Zdyj4ge1N7Vo0E9DqE7Wvf8vEVapVGWI"
+  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAZXhhbXBsZS5jb20iLCJpZCI6IjMiLCJ1c2VyVHlwZSI6IlBST0ZFU1NJT05BTCIsImlhdCI6MTczMTg2MDM4NCwiZXhwIjoxNzM0NDUyMzg0fQ.697R3Ia1_wjmLa8LSIDIj7agYz-gsrpC3qP6JnXO9A4"
 
   useEffect(() => {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
       cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
       channelAuthorization: {
-        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL3 + `/${usertype}/${appUserId}/${professionalId}`
+        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL3 + `/${professionalId}`
       }
     });
 
     const pusherBindEvents = async () => {
-      console.log('bound');
-      const toProChannel = pusherClient.subscribe(`presence-user-to-pro-chat-channel-${professionalId}`);
-      setToProChannel(toProChannel)
-      toProChannel.bind("pusher:subscription_succeeded", (members) => {
+      // FOR APP USER
+      const userChannel = pusherClient.subscribe(`presence-for-pro-chat-channel-${professionalId}`);
+      userChannel.bind("pusher:subscription_succeeded", (members) => {
         console.log('pro channel all members details', members.count, members);
         if(members.count === 2)
           setProIsOnline(true)
@@ -41,28 +39,30 @@ function App() {
           console.log('member', member)
         });
       });
-      toProChannel.bind("pusher:member_added", (member) => {
+      userChannel.bind("pusher:member_added", (member) => {
         setStatusMessage(`${member.info.username} has joined the chat`)
         setProIsOnline(true)
       });
-      toProChannel.bind("pusher:member_removed", (member) => {
+      userChannel.bind("pusher:member_removed", (member) => {
         setStatusMessage(`${member.info.username} has left the chat`)
         setProIsOnline(false)
       });
-      toProChannel.bind("pusher:subscription_error", (data) => {
+      userChannel.bind("pusher:subscription_error", (data) => {
         console.log('subscription_error', data)
       });
-      toProChannel.bind("pusher:subscription_error", (data) => {
+      userChannel.bind("pusher:subscription_error", (data) => {
         console.log('subscription_error', data)
       });
-      toProChannel.bind("client-send-message", (data) => {
+      userChannel.bind(`client-send-message-user-chat-${appUserId}`, (data) => {
         setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
         setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
       });
+      setUserChannel(userChannel)
+      getMessagesForAppUser()
 
-      const userChannel = pusherClient.subscribe(`presence-user-to-pro-chat-channel-${appUserId}`);
-      setToUserChannel(userChannel)
-      toUserChannel.bind("pusher:subscription_succeeded", (members) => {
+      // FOR PRO
+      const proChannel = pusherClient.subscribe(`presence-for-user-chat-channel-${appUserId}`);
+      proChannel.bind("pusher:subscription_succeeded", (members) => {
         console.log('user channel all members details', members.count, members);
         if(members.count === 2)
           setUserIsOnline(true)
@@ -71,38 +71,38 @@ function App() {
           console.log('member', member)
         });
       });
-      toUserChannel.bind("pusher:member_added", (member) => {
+      proChannel.bind("pusher:member_added", (member) => {
         setStatusMessage(`${member.info.username} has joined the chat`)
         setUserIsOnline(true)
       });
-      toUserChannel.bind("pusher:member_removed", (member) => {
+      proChannel.bind("pusher:member_removed", (member) => {
         setStatusMessage(`${member.info.username} has left the chat`)
         setUserIsOnline(false)
       });
-      toUserChannel.bind("pusher:subscription_error", (data) => {
+      proChannel.bind("pusher:subscription_error", (data) => {
         console.log('subscription_error', data)
       });
-      toUserChannel.bind("pusher:subscription_error", (data) => {
+      proChannel.bind("pusher:subscription_error", (data) => {
         console.log('subscription_error', data)
       });
-      toUserChannel.bind("client-send-message", (data) => {
+      proChannel.bind(`client-send-message-pro-chat-${professionalId}`, (data) => {
         setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
         setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
       });
+      setProChannel(proChannel)
+      getMessagesForPro()
     };
 
-    console.log('henlo');
-    getMessagesForAppUser()
-    getMessagesForPro()
-    console.log(pusherClient);
+    console.log('bound');
+    console.log(pusherClient)
     pusherBindEvents()
     return (() => {
-      pusherClient.unsubscribe(`presence-user-to-pro-chat-channel-${professionalId}`)
-      pusherClient.unsubscribe(`presence-user-to-pro-chat-channel-${appUserId}`)
+      pusherClient.unsubscribe(`presence-for-pro-chat-channel-${professionalId}`)
+      pusherClient.unsubscribe(`presence-for-user-chat-channel-${appUserId}`)
     })
   }, [])
 
-  // FOR APP USERS
+  // FOR APP USER
   const getMessagesForAppUser = async () => {
     const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/app/professionals/get_connection_chat_messages_as_user/` + professionalId, {
         headers: {
@@ -115,11 +115,10 @@ function App() {
     setAppUserMessages(data.data.chat_messages)
   }
 
-  // FOR APP USERS
   const sendMessageToPro = async () => {
-    toProChannel.trigger(`client-send-message-pro-chat-${professionalId}`, { sent_by_user: false, professional_id: professionalId, user_id: appUserId, message: messageToBeSent });
+    userChannel.trigger(`client-send-message-pro-chat-${professionalId}`, { sent_by_user: true, professional_id: professionalId, user_id: appUserId, message: messageToBeSent })
     setMessageToBeSent('')
-    console.log('sent');
+    console.log('sent')
   }
 
   // FOR PROS
@@ -135,17 +134,17 @@ function App() {
     setProMessages(data.data.chat_messages)
   }
 
-  // FOR PROS
   const sendMessageToAppUser = async () => {
-    toProChannel.trigger(`client-send-message-pro-chat-${professionalId}`, { sent_by_user: false, professional_id: professionalId, user_id: appUserId, message: messageToBeSent });
+    proChannel.trigger(`client-send-message-user-chat-${appUserId}`, { sent_by_user: false, professional_id: professionalId, user_id: appUserId, message: messageToBeSent })
     setMessageToBeSent('')
-    console.log('sent');
+    console.log('sent')
   }
 
   return (
     <>
       <h5>{statusMessage ? statusMessage : ''}</h5>
-      <h5>{proIsOnline ? 'Other person is online' : 'Other person is offline'}</h5>
+      <h5>{proIsOnline ? 'Professional is online' : 'Professional is offline'}</h5>
+      <h5>{userIsOnline ? 'APp user is online' : 'APp user is offline'}</h5>
       <div style={{ display: "flex" }}>
         <br />
         {/* FOR APP USERS */}
