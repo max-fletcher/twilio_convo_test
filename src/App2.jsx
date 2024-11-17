@@ -11,10 +11,10 @@ function App() {
 
   const appUserId = 'usr_56913465891340'
   const appUserId2 = 'usr_56913465891350'
-  const appUserAuthToken1 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOm51bGwsInVzZXJuYW1lIjoiZmxldGNoZXIiLCJlbWFpbCI6Im1haGluLmNob3dkaHVyeS4xOTkxQGdtYWlsLmNvbSIsInBob25lIjoiKzg4MDE3NjIyMTQzMTUiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0Ijp0cnVlLCJpYXQiOjE3MzE2NzE3NjcsImV4cCI6MTczNDI2Mzc2N30.Mzd1_7h2Zs7GoLDbp-L_CihzPqnUQw-NcUgHPVk31yM"
-  const appUserAuthToken2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM1MCIsIm5hbWUiOm51bGwsInVzZXJuYW1lIjoiVXNlciAyIiwiZW1haWwiOiJ1c2VyMkBtYWlsLmNvbSIsInBob25lIjoiMjM0NTY3ODkiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzMxNjgwNjkzLCJleHAiOjE3MzQyNzI2OTN9.nfJHk36vdGZOB7p5A_avgn_RXzA7Nr-J582l1idBbu4"
-  const auctionUniqueId = 'auc_9bZJfSrzRy'
-  const batchUniqueId = 'batch_SULmkKLk6g'
+  const appUserAuthToken1 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxODE3NTAwLCJleHAiOjE3MzQ0MDk1MDB9.wIfnxyNE4XJgNt4SgSGIH3qDbOZ-zhsSJFMwOAs964c"
+  const appUserAuthToken2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM1MCIsIm5hbWUiOm51bGwsInVzZXJuYW1lIjoiVXNlciAyIiwiZW1haWwiOiJ1c2VyMkBtYWlsLmNvbSIsInBob25lIjoiMjM0NTY3ODkiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzMxODE4ODE2LCJleHAiOjE3MzQ0MTA4MTZ9.6uOdm6Ex8F_S-6AGERUuQRNURm-lTKO0AjP9xBEemeI"
+  const auctionUniqueId = 'auc_Q9lZki2dR9'
+  const batchUniqueId = 'batch_SUxBw5neCi'
   const urlParams = new URLSearchParams(window.location.search);
   const userNo = urlParams.get('userNo'); // 'FIRST'|'SECOND'
   const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
@@ -111,9 +111,9 @@ function App() {
       <br />
       <p>
         CurrentUser: 
-        Id: { currentUser.id }
-        Name: { currentUser.name }
-        Username: { currentUser.username }
+        Id: { currentUser.id } <br />
+        Name: { currentUser.name } <br />
+        Username: { currentUser.username } <br />
       </p>
       <br />
       <div>
