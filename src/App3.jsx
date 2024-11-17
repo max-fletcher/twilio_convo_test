@@ -5,54 +5,90 @@ function App() {
   const [messageToBeSent, setMessageToBeSent] = useState('')
   const [appUserMessages, setAppUserMessages] = useState([])
   const [proMessages, setProMessages] = useState([])
-  const [otherPersonIsOnline, setOtherPersonIsOnline] = useState(false)
+  const [proIsOnline, setProIsOnline] = useState(false)
+  const [userIsOnline, setUserIsOnline] = useState(false)
   const [statusMessage, setStatusMessage] = useState(null)
+  const [toProChannel, setToProChannel]=useState(null)
+  const [toUserChannel, setToUserChannel]=useState(null)
 
-  const appUserId = 'usr_56913465891350'
-  const professionalId = 'pro_jadjha98w'
+  const appUserId = 'usr_56913465891340'
+  const professionalId = 'pro_hn9a8wdh89ahd'
   // const usertype = 'APPUSER' // 'APPUSER'|'PROFESSIONAL'
   const urlParams = new URLSearchParams(window.location.search);
   const usertype = urlParams.get('usertype'); // 'APPUSER'|'PROFESSIONAL'
-  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM1MCIsIm5hbWUiOm51bGwsInVzZXJuYW1lIjoiVXNlciAyIiwiZW1haWwiOiJ1c2VyMkBtYWlsLmNvbSIsInBob25lIjoiMjM0NTY3ODkiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzMxNjgwNjkzLCJleHAiOjE3MzQyNzI2OTN9.nfJHk36vdGZOB7p5A_avgn_RXzA7Nr-J582l1idBbu4"
-  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAZXhhbXBsZS5jb20iLCJpZCI6IjMiLCJ1c2VyVHlwZSI6IlBST0ZFU1NJT05BTCIsImlhdCI6MTczMTc0MzQwNywiZXhwIjoxNzM0MzM1NDA3fQ.IF4udDDo1zdYpSF8s96_oqu6VXo7o4L5QHjk97uoDOg"
-  const connectionUniqueId = 'con_FVXF7WP9ub'
+  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxODM0NjYyLCJleHAiOjE3MzQ0MjY2NjJ9.mpPdVPah8UoHhuWWeQ23l_hmzzGmBDKXID-FECXzJPE"
+  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwiaWF0IjoxNzMxODM0NzExLCJleHAiOjE3MzQ0MjY3MTF9.RpxP44fNNb2n6wu2cIV_iuZmBz8EGCtD1cGziDU6le4"
+  const connectionUniqueId = 'con_0B4PIHjbYn'
 
   useEffect(() => {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
       cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
       channelAuthorization: {
-        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL + `/${usertype}/${appUserId}/${professionalId}`
+        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL3 + `/${usertype}/${appUserId}/${professionalId}`
       }
     });
 
     const pusherBindEvents = async () => {
       console.log('bound');
-      const channel = pusherClient.subscribe(`presence-pro-connection-chat-${connectionUniqueId}`);
-  
-      channel.bind("pusher:subscription_succeeded", (members) => {
-        console.log('all members details', members.count, members);
+      const toProChannel = pusherClient.subscribe(`presence-user-to-pro-chat-channel-${professionalId}`);
+      setToProChannel(toProChannel)
+      toProChannel.bind("pusher:subscription_succeeded", (members) => {
+        console.log('pro channel all members details', members.count, members);
         if(members.count === 2)
-          setOtherPersonIsOnline(true)
+          setProIsOnline(true)
         // LIST OF JOINED MEMBERS
         members.each((member) => {
           console.log('member', member)
         });
       });
-      channel.bind("pusher:member_added", (member) => {
+      toProChannel.bind("pusher:member_added", (member) => {
         setStatusMessage(`${member.info.username} has joined the chat`)
-        setOtherPersonIsOnline(true)
+        setProIsOnline(true)
       });
-      channel.bind("pusher:member_removed", (member) => {
+      toProChannel.bind("pusher:member_removed", (member) => {
         setStatusMessage(`${member.info.username} has left the chat`)
-        setOtherPersonIsOnline(false)
+        setProIsOnline(false)
       });
-      channel.bind("pusher:subscription_error", (data) => {
-          console.log('subscription_error', data)
+      toProChannel.bind("pusher:subscription_error", (data) => {
+        console.log('subscription_error', data)
       });
-      channel.bind("send-connection-message", (data) => {
+      toProChannel.bind("pusher:subscription_error", (data) => {
+        console.log('subscription_error', data)
+      });
+      toProChannel.bind("client-send-message", (data) => {
         setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
         setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
-      })
+      });
+
+      const userChannel = pusherClient.subscribe(`presence-user-to-pro-chat-channel-${appUserId}`);
+      setToUserChannel(userChannel)
+      toUserChannel.bind("pusher:subscription_succeeded", (members) => {
+        console.log('user channel all members details', members.count, members);
+        if(members.count === 2)
+          setUserIsOnline(true)
+        // LIST OF JOINED MEMBERS
+        members.each((member) => {
+          console.log('member', member)
+        });
+      });
+      toUserChannel.bind("pusher:member_added", (member) => {
+        setStatusMessage(`${member.info.username} has joined the chat`)
+        setUserIsOnline(true)
+      });
+      toUserChannel.bind("pusher:member_removed", (member) => {
+        setStatusMessage(`${member.info.username} has left the chat`)
+        setUserIsOnline(false)
+      });
+      toUserChannel.bind("pusher:subscription_error", (data) => {
+        console.log('subscription_error', data)
+      });
+      toUserChannel.bind("pusher:subscription_error", (data) => {
+        console.log('subscription_error', data)
+      });
+      toUserChannel.bind("client-send-message", (data) => {
+        setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
+        setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
+      });
     };
 
     console.log('henlo');
@@ -61,13 +97,14 @@ function App() {
     console.log(pusherClient);
     pusherBindEvents()
     return (() => {
-      pusherClient.unsubscribe(`presence-pro-connection-chat-${connectionUniqueId}`)
+      pusherClient.unsubscribe(`presence-user-to-pro-chat-channel-${professionalId}`)
+      pusherClient.unsubscribe(`presence-user-to-pro-chat-channel-${appUserId}`)
     })
   }, [])
 
   // FOR APP USERS
   const getMessagesForAppUser = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/app/professionals/get_connection_chat_messages_as_user/` + professionalId, {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/app/professionals/get_connection_chat_messages_as_user/` + professionalId, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${appUserAuthToken}`
@@ -80,21 +117,14 @@ function App() {
 
   // FOR APP USERS
   const sendMessageToPro = async () => {
-    await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/app/professionals/send_message_to_professional/` + professionalId, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${appUserAuthToken}`
-      },
-      body:JSON.stringify({ message: messageToBeSent })
-    })
+    toProChannel.trigger(`client-send-message-pro-chat-${professionalId}`, { sent_by_user: false, professional_id: professionalId, user_id: appUserId, message: messageToBeSent });
     setMessageToBeSent('')
     console.log('sent');
   }
 
   // FOR PROS
   const getMessagesForPro = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/professionals/get_connection_chat_messages_as_admin/` + appUserId, {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/professionals/get_connection_chat_messages_as_admin/` + appUserId, {
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${proAuthToken}`
@@ -107,14 +137,7 @@ function App() {
 
   // FOR PROS
   const sendMessageToAppUser = async () => {
-    await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/professionals/send_message_to_app_user/` + appUserId, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${proAuthToken}`
-      },
-      body:JSON.stringify({ message: messageToBeSent })
-    })
+    toProChannel.trigger(`client-send-message-pro-chat-${professionalId}`, { sent_by_user: false, professional_id: professionalId, user_id: appUserId, message: messageToBeSent });
     setMessageToBeSent('')
     console.log('sent');
   }
@@ -122,7 +145,7 @@ function App() {
   return (
     <>
       <h5>{statusMessage ? statusMessage : ''}</h5>
-      <h5>{otherPersonIsOnline ? 'Other person is online' : 'Other person is offline'}</h5>
+      <h5>{proIsOnline ? 'Other person is online' : 'Other person is offline'}</h5>
       <div style={{ display: "flex" }}>
         <br />
         {/* FOR APP USERS */}
