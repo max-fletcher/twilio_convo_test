@@ -17,14 +17,44 @@ function App() {
   const batchUniqueId = 'batch_SUxBw5neCi'
   const urlParams = new URLSearchParams(window.location.search);
   const userNo = urlParams.get('userNo'); // 'FIRST'|'SECOND'
-  const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    channelAuthorization: {
-      endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL2 + `/authorize_group_chat_user/${userNo === 'FIRST' ? appUserId : appUserId2 }/auction/${auctionUniqueId}/batch/${batchUniqueId}`
-    }
-  });
 
   useEffect(() => {
+    const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+      cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
+      channelAuthorization: {
+        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL2 + `/authorize_group_chat_user/${userNo === 'FIRST' ? appUserId : appUserId2 }/auction/${auctionUniqueId}/batch/${batchUniqueId}`
+      }
+    });
+
+    const pusherBindEvents = async () => {
+      var channel = pusherClient.subscribe(`presence-auction-live-chat-${auctionUniqueId}-batch-${batchUniqueId}`);
+  
+      channel.bind("pusher:subscription_succeeded", (members) => {
+        
+        var thisUser = channel.members.me;
+        setCurrentUser({ id: thisUser.id, ...thisUser.info })
+  
+        // console.log('all members details', members.count, members);
+        setJoinedMembersCount(members.count)
+        // LIST OF JOINED MEMBERS
+        members.each((member) => {
+          console.log('member', member)
+        });
+      });
+      channel.bind("pusher:member_added", (member) => {
+        setStatusMessage(`${member.info.username} has joined the chat`)
+      });
+      channel.bind("pusher:member_removed", (member) => {
+        setStatusMessage(`${member.info.username} has left the chat`)
+      });
+      channel.bind("pusher:subscription_error", (data) => {
+          console.log('subscription_error', data)
+      });
+      channel.bind("send-aucbat-group-chat-message", (data) => {
+        setAllMessages(prevMessages => [...prevMessages, data])
+      });
+    };
+
     console.log('henlo');
     getTotalUsers()
     getAllMessages()
@@ -34,35 +64,6 @@ function App() {
       pusherClient.unsubscribe(`presence-auction-live-chat-${auctionUniqueId}-batch-${batchUniqueId}`)
     })
   }, [])
-
-  const pusherBindEvents = async () => {
-    var channel = pusherClient.subscribe(`presence-auction-live-chat-${auctionUniqueId}-batch-${batchUniqueId}`);
-
-    channel.bind("pusher:subscription_succeeded", (members) => {
-      
-      var thisUser = channel.members.me;
-      setCurrentUser({ id: thisUser.id, ...thisUser.info })
-
-      // console.log('all members details', members.count, members);
-      setJoinedMembersCount(members.count)
-      // LIST OF JOINED MEMBERS
-      members.each((member) => {
-        console.log('member', member)
-      });
-    });
-    channel.bind("pusher:member_added", (member) => {
-      setStatusMessage(`${member.info.username} has joined the chat`)
-    });
-    channel.bind("pusher:member_removed", (member) => {
-      setStatusMessage(`${member.info.username} has left the chat`)
-    });
-    channel.bind("pusher:subscription_error", (data) => {
-        console.log('subscription_error', data)
-    });
-    channel.bind("send-aucbat-group-chat-message", (data) => {
-      setAllMessages(prevMessages => [data, ...prevMessages])
-    });
-  };
 
   const getTotalUsers = async () => {
     const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL2 + `/auctions/app/get_auction_batch_joined_users/${auctionUniqueId}/batch/${batchUniqueId}`, {
