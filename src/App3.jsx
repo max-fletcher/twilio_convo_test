@@ -45,9 +45,6 @@ function App() {
         userChannel.bind("pusher:subscription_error", (data) => {
           console.log('subscription_error', data)
         });
-        userChannel.bind("pusher:subscription_error", (data) => {
-          console.log('subscription_error', data)
-        });
         userChannel.bind(`send-message-to-user-chat`, (data) => {
           console.log('send-message-to-user-chat', data);
           setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
@@ -76,9 +73,6 @@ function App() {
         proChannel.bind("pusher:subscription_error", (data) => {
           console.log('subscription_error', data)
         });
-        proChannel.bind("pusher:subscription_error", (data) => {
-          console.log('subscription_error', data)
-        });
         proChannel.bind(`send-message-to-pro-chat`, (data) => {
           console.log('send-message-to-pro-chat', data);
           // setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
@@ -89,7 +83,7 @@ function App() {
       }
     };
 
-    console.log('bound');
+    console.log('bindings set');
     console.log(pusherClient)
     pusherBindEvents()
     return (() => {
@@ -122,14 +116,11 @@ function App() {
     })
     const data = await response.json()
     const newMessageObject = {
-      createdAt: new Date().toDateString,
-      is_seen: null,
+      createdAt: new Date().toISOString(),
       message: messageToBeSent,
       sent_by_user: true,
     }
-    console.log('sendMessageToPro', data, 'proMessages', proMessages, 'messageToBeSent', messageToBeSent)
     setAppUserMessages(prevMessages => [...prevMessages, newMessageObject])
-    console.log('appUserMessages', appUserMessages);
     setMessageToBeSent('')
     console.log('sent');
   }
@@ -157,16 +148,12 @@ function App() {
       body:JSON.stringify({ message: messageToBeSent })
     })
     const data = await response.json()
-    console.log('sendMessageToAppUser', data, 'appUserMessages', appUserMessages, 'messageToBeSent', messageToBeSent)
     const newMessageObject = {
-      createdAt: new Date().toDateString,
-      is_seen: null,
+      createdAt: new Date().toISOString(),
       message: messageToBeSent,
-      sent_by_user: true,
+      sent_by_user: false,
     }
     setProMessages(prevMessages => [...prevMessages, newMessageObject])
-    console.log('appUserMessages', appUserMessages);
-
     setMessageToBeSent('')
     console.log('sent');
   }
