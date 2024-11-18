@@ -21,68 +21,72 @@ function App() {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
       cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
       channelAuthorization: {
-        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL3 + `/${professionalId}`
+        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL3 + `/${usertype === 'PROFESSIONAL' ? professionalId : appUserId}`
       }
     });
 
     const pusherBindEvents = async () => {
-      // FOR APP USER
-      const userChannel = pusherClient.subscribe(`presence-user-chat-listener-${appUserId}`);
-      userChannel.bind("pusher:subscription_succeeded", (members) => {
-        console.log('user channel all members details', members.count, members);
-        // LIST OF JOINED MEMBERS
-        members.each((member) => {
-          console.log('member', member)
+      if(usertype === "APPUSER"){
+        // FOR APP USER
+        const userChannel = pusherClient.subscribe(`presence-user-chat-listener-${appUserId}`);
+        userChannel.bind("pusher:subscription_succeeded", (members) => {
+          console.log('user channel all members details', members.count, members);
+          // LIST OF JOINED MEMBERS
+          members.each((member) => {
+            console.log('member', member)
+          });
         });
-      });
-      userChannel.bind("pusher:member_added", (member) => {
-        setStatusMessage(`${member.info.username} has joined the chat`)
-      });
-      userChannel.bind("pusher:member_removed", (member) => {
-        setStatusMessage(`${member.info.username} has left the chat`)
-      });
-      userChannel.bind("pusher:subscription_error", (data) => {
-        console.log('subscription_error', data)
-      });
-      userChannel.bind("pusher:subscription_error", (data) => {
-        console.log('subscription_error', data)
-      });
-      userChannel.bind(`send-message-to-user-chat`, (data) => {
-        console.log('send-message-to-user-chat');
-        setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
-        setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
-      });
-      setUserChannel(userChannel)
-      getMessagesForPro()
+        userChannel.bind("pusher:member_added", (member) => {
+          setStatusMessage(`${member.info.username} has joined the chat`)
+        });
+        userChannel.bind("pusher:member_removed", (member) => {
+          setStatusMessage(`${member.info.username} has left the chat`)
+        });
+        userChannel.bind("pusher:subscription_error", (data) => {
+          console.log('subscription_error', data)
+        });
+        userChannel.bind("pusher:subscription_error", (data) => {
+          console.log('subscription_error', data)
+        });
+        userChannel.bind(`send-message-to-user-chat`, (data) => {
+          console.log('send-message-to-user-chat', data);
+          setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
+          // setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
+        });
+        setUserChannel(userChannel)
+        getMessagesForAppUser()
+      }
 
-      // FOR PRO
-      const proChannel = pusherClient.subscribe(`presence-pro-chat-listener-${professionalId}`);
-      proChannel.bind("pusher:subscription_succeeded", (members) => {
-        console.log('pro channel all members details', members.count, members);
-        // LIST OF JOINED MEMBERS
-        members.each((member) => {
-          console.log('member', member)
+      if(usertype === "PROFESSIONAL"){
+        // FOR PRO
+        const proChannel = pusherClient.subscribe(`presence-pro-chat-listener-${professionalId}`);
+        proChannel.bind("pusher:subscription_succeeded", (members) => {
+          console.log('pro channel all members details', members.count, members);
+          // LIST OF JOINED MEMBERS
+          members.each((member) => {
+            console.log('member', member)
+          });
         });
-      });
-      proChannel.bind("pusher:member_added", (member) => {
-        setStatusMessage(`${member.info.username} has joined the chat`)
-      });
-      proChannel.bind("pusher:member_removed", (member) => {
-        setStatusMessage(`${member.info.username} has left the chat`)
-      });
-      proChannel.bind("pusher:subscription_error", (data) => {
-        console.log('subscription_error', data)
-      });
-      proChannel.bind("pusher:subscription_error", (data) => {
-        console.log('subscription_error', data)
-      });
-      proChannel.bind(`send-message-to-pro-chat`, (data) => {
-        console.log('send-message-to-pro-chat');
-        setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
-        setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
-      });
-      setProChannel(proChannel)
-      getMessagesForAppUser()
+        proChannel.bind("pusher:member_added", (member) => {
+          setStatusMessage(`${member.info.username} has joined the chat`)
+        });
+        proChannel.bind("pusher:member_removed", (member) => {
+          setStatusMessage(`${member.info.username} has left the chat`)
+        });
+        proChannel.bind("pusher:subscription_error", (data) => {
+          console.log('subscription_error', data)
+        });
+        proChannel.bind("pusher:subscription_error", (data) => {
+          console.log('subscription_error', data)
+        });
+        proChannel.bind(`send-message-to-pro-chat`, (data) => {
+          console.log('send-message-to-pro-chat', data);
+          // setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
+          setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
+        });
+        setProChannel(proChannel)
+        getMessagesForPro()
+      }
     };
 
     console.log('bound');
@@ -108,14 +112,24 @@ function App() {
   }
 
   const sendMessageToPro = async () => {
-    await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/app/professionals/send_message_to_professional/v2/` + professionalId, {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/app/professionals/send_message_to_professional/v2/` + professionalId, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${appUserAuthToken}`
+        "Authorization": `Bearer ${appUserAuthToken}`
       },
       body:JSON.stringify({ message: messageToBeSent })
     })
+    const data = await response.json()
+    const newMessageObject = {
+      createdAt: new Date().toDateString,
+      is_seen: null,
+      message: messageToBeSent,
+      sent_by_user: true,
+    }
+    console.log('sendMessageToPro', data, 'proMessages', proMessages, 'messageToBeSent', messageToBeSent)
+    setAppUserMessages(prevMessages => [...prevMessages, newMessageObject])
+    console.log('appUserMessages', appUserMessages);
     setMessageToBeSent('')
     console.log('sent');
   }
@@ -134,7 +148,7 @@ function App() {
   }
 
   const sendMessageToAppUser = async () => {
-    await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/professionals/send_message_to_app_user/v2/` + appUserId, {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/professionals/send_message_to_app_user/v2/` + appUserId, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -142,6 +156,17 @@ function App() {
       },
       body:JSON.stringify({ message: messageToBeSent })
     })
+    const data = await response.json()
+    console.log('sendMessageToAppUser', data, 'appUserMessages', appUserMessages, 'messageToBeSent', messageToBeSent)
+    const newMessageObject = {
+      createdAt: new Date().toDateString,
+      is_seen: null,
+      message: messageToBeSent,
+      sent_by_user: true,
+    }
+    setProMessages(prevMessages => [...prevMessages, newMessageObject])
+    console.log('appUserMessages', appUserMessages);
+
     setMessageToBeSent('')
     console.log('sent');
   }
