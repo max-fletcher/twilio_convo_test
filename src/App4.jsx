@@ -41,7 +41,7 @@ function App() {
           console.log('subscription_error', data)
       });
       channel.bind("new-bid-placed", (data) => {
-        console.log('new-bid-placed');
+        console.log('new-bid-placed', data)
         setBids(prevBids => [data, ...prevBids])
       });
     };
