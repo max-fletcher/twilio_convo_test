@@ -21,9 +21,8 @@ function App() {
 
     const pusherBindEvents = async () => {
       console.log('bound');
+      console.log('channel', `presence-auction-bids-${auctionUniqueId}-batch-${batchUniqueId}`);
       const channel = pusherClient.subscribe(`presence-auction-bids-${auctionUniqueId}-batch-${batchUniqueId}`);
-      channel.trigger('client-trigger-event', { data: 'databoi1' });
-
       channel.bind("pusher:subscription_succeeded", (members) => {
         console.log('all members details', members.count, members);
         setOnlineCount(members.count)
@@ -56,18 +55,17 @@ function App() {
     })
   }, [])
 
-    // FOR PROS
-    const getAuctionBatchBids = async () => {
-      const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL4 + `/auctions/app/view_auction_batch_bids/${auctionUniqueId}/batch/${batchUniqueId}`, {
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${appUserToken}`
-          },
-        }
-      )
-      const data = await response.json()
-      setBids(data.data.bids)
-    }
+  const getAuctionBatchBids = async () => {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL4 + `/auctions/app/view_auction_batch_bids/${auctionUniqueId}/batch/${batchUniqueId}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${appUserToken}`
+        },
+      }
+    )
+    const data = await response.json()
+    setBids(data.data.bids)
+  }
 
   return (
     <>
