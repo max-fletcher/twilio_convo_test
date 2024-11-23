@@ -6,10 +6,10 @@ function App() {
   const [onlineCount, setOnlineCount] = useState(0)
   const [statusMessage, setStatusMessage] = useState(null)
 
-  const auctionUniqueId = "auc_qr5IhJktQP"
-  const batchUniqueId = "batch_CoGdtOO2Uv"
+  const auctionUniqueId = "auc_euYBAbKLyN"
+  const batchUniqueId = "batch_O2PEK1FxDR"
   const appUserId = "usr_56913465891340"
-  const appUserToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMyMTYzOTg0LCJleHAiOjE3MzQ3NTU5ODR9.GMKWuhspnhJsP4jl4KfAZu6gfmivB8eHZ3FxsTYwIGs"
+  const appUserToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOm51bGwsInVzZXJuYW1lIjoiZmxldGNoZXIiLCJlbWFpbCI6Im1haGluLmNob3dkaHVyeS4xOTkxQGdtYWlsLmNvbSIsInBob25lIjoiKzg4MDE3NjIyMTQzMTUiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0Ijp0cnVlLCJpYXQiOjE3MzIzNjMzMzAsImV4cCI6MTczNDk1NTMzMH0.ZNZu_qV7uNWicOKQFZ0ajINQ34TASoY7GzOwI4Q_To4"
 
   useEffect(() => {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
@@ -43,6 +43,10 @@ function App() {
       channel.bind("new-bid-placed", (data) => {
         console.log('new-bid-placed', data)
         setBids(prevBids => [data, ...prevBids])
+      });
+      channel.bind("bid-changed", (data) => {
+        console.log('bid-changed', data)
+        setBids(prevBids => [data, ...prevBids.filter(bid => bid.uniqueId !== data.replaceUniqueId)])
       });
     };
 
