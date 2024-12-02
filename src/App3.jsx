@@ -14,8 +14,8 @@ function App() {
   // const usertype = 'APPUSER' // 'APPUSER'|'PROFESSIONAL'
   const urlParams = new URLSearchParams(window.location.search);
   const usertype = urlParams.get('usertype'); // 'APPUSER'|'PROFESSIONAL'
-  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxOTA1ODk0LCJleHAiOjE3MzQ0OTc4OTR9.K_yKCU21ILKjOvRVu8uB2GWaMAZY3dIPrIDCUPcVTZ8"
-  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwiaWF0IjoxNzMxOTA1OTA1LCJleHAiOjE3MzQ0OTc5MDV9.XDLh0g_wJm5CAEBgdY_kdRw1HfqjpkHbyiomoWGPgug"
+  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMzMTM5NjUxLCJleHAiOjE3MzU3MzE2NTF9.bKXPen1KqmQhzI2Nhz97tW8RLDQFugX2gRizyk_9_1s"
+  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwicHJvZmVzc2lvbmFsSWQiOiJwcm9faG45YTh3ZGg4OWFoZCIsImlhdCI6MTczMzEzOTAwNCwiZXhwIjoxNzM1NzMxMDA0fQ.2eQUH3m2T5758606kSgtCpnmJQy5WlpK9Ct7w2uulFo"
 
   useEffect(() => {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
@@ -94,68 +94,85 @@ function App() {
 
   // FOR APP USER
   const getMessagesForAppUser = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/app/professionals/get_connection_chat_messages_as_user/` + professionalId, {
+    try {
+      const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/app/professionals/get_connection_chat_messages_as_user/` + professionalId, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${appUserAuthToken}`
+          },
+        }
+      )
+      const data = await response.json()
+      setAppUserMessages(data.data.chat_messages)
+    } catch (error) {
+      console.log('getMessagesForAppUser', error, error.message);
+    }
+  }
+
+  const sendMessageToPro = async () => {
+    try {
+      const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/app/professionals/send_message_to_professional/v2/` + professionalId, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${appUserAuthToken}`
         },
+        body:JSON.stringify({ message: messageToBeSent })
+      })
+      const data = await response.json()
+      const newMessageObject = {
+        createdAt: new Date().toISOString(),
+        message: messageToBeSent,
+        sent_by_user: true,
       }
-    )
-    const data = await response.json()
-    setAppUserMessages(data.data.chat_messages)
-  }
-
-  const sendMessageToPro = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL + `/app/professionals/send_message_to_professional/v2/` + professionalId, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${appUserAuthToken}`
-      },
-      body:JSON.stringify({ message: messageToBeSent })
-    })
-    const data = await response.json()
-    const newMessageObject = {
-      createdAt: new Date().toISOString(),
-      message: messageToBeSent,
-      sent_by_user: true,
+      setAppUserMessages(prevMessages => [...prevMessages, newMessageObject])
+      setMessageToBeSent('')
+      console.log('sent');
+    } catch (error) {
+      console.log('sendMessageToPro', error, error.message);
     }
-    setAppUserMessages(prevMessages => [...prevMessages, newMessageObject])
-    setMessageToBeSent('')
-    console.log('sent');
   }
 
   // FOR PROS
   const getMessagesForPro = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/professionals/get_connection_chat_messages_as_admin/` + appUserId, {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${proAuthToken}`
-        },
-      }
-    )
-    const data = await response.json()
-    setProMessages(data.data.chat_messages)
+    try {
+      const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/professionals/get_connection_chat_messages_as_admin/` + appUserId, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${proAuthToken}`
+          },
+        }
+      )
+      const data = await response.json()
+      setProMessages(data.data.chat_messages)
+    } catch (error) {
+      console.log('getMessagesForPro', error, error.message);
+    }
+
   }
 
   const sendMessageToAppUser = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/professionals/send_message_to_app_user/v2/` + appUserId, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${proAuthToken}`
-      },
-      body:JSON.stringify({ message: messageToBeSent })
-    })
-    const data = await response.json()
-    const newMessageObject = {
-      createdAt: new Date().toISOString(),
-      message: messageToBeSent,
-      sent_by_user: false,
+    try {
+      const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL3 + `/professionals/send_message_to_app_user/v2/` + appUserId, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${proAuthToken}`
+        },
+        body:JSON.stringify({ message: messageToBeSent })
+      })
+      const data = await response.json()
+      const newMessageObject = {
+        createdAt: new Date().toISOString(),
+        message: messageToBeSent,
+        sent_by_user: false,
+      }
+      setProMessages(prevMessages => [...prevMessages, newMessageObject])
+      setMessageToBeSent('')
+      console.log('sent');
+    } catch (error) {
+      console.log('sendMessageToAppUser', error, error.message);
     }
-    setProMessages(prevMessages => [...prevMessages, newMessageObject])
-    setMessageToBeSent('')
-    console.log('sent');
   }
 
   return (
