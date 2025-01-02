@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Pusher from 'pusher-js';
 
+// PROFESSIONAL CHAT
 function App() {
   const [messageToBeSent, setMessageToBeSent] = useState('')
   const [appUserMessages, setAppUserMessages] = useState([])

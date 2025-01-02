@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Pusher from 'pusher-js';
 
+// PROFESSIONAL CHAT MULTIPLE CHANNEL
 function App() {
   const [messageToBeSent, setMessageToBeSent] = useState('')
   const [appUserMessages, setAppUserMessages] = useState([])
@@ -14,8 +15,8 @@ function App() {
   // const usertype = 'APPUSER' // 'APPUSER'|'PROFESSIONAL'
   const urlParams = new URLSearchParams(window.location.search);
   const usertype = urlParams.get('usertype'); // 'APPUSER'|'PROFESSIONAL'
-  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMxOTA1ODk0LCJleHAiOjE3MzQ0OTc4OTR9.K_yKCU21ILKjOvRVu8uB2GWaMAZY3dIPrIDCUPcVTZ8"
-  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwiaWF0IjoxNzMxOTA1OTA1LCJleHAiOjE3MzQ0OTc5MDV9.XDLh0g_wJm5CAEBgdY_kdRw1HfqjpkHbyiomoWGPgug"
+  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMzMzc5MjEzLCJleHAiOjE3MzU5NzEyMTN9.r7NDL12U5lf0eeaksBMzdmijN38jCG83r5qmALbUgwI"
+  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwicHJvZmVzc2lvbmFsSWQiOiJwcm9faG45YTh3ZGg4OWFoZCIsImlhdCI6MTczMzM3OTIwNSwiZXhwIjoxNzM1OTcxMjA1fQ.EnwByMRiX3avO5B_MxhoGkYjRMYrO6e-4drqm8aW_YI"
 
   useEffect(() => {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
