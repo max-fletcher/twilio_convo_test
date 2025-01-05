@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Pusher from 'pusher-js';
 
-// BLOG CHAT
+// FORUM CHAT
 function App() {
   const [currentUser, setCurrentUser] = useState({})
   const [messageToBeSent, setMessageToBeSent] = useState('')
@@ -13,8 +13,8 @@ function App() {
   const appUserId2 = 'usr_FY9TFfGmIW'
   const appUserAuthToken1 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl9SaWgyN0xRTTVLIiwibmFtZSI6ImZsZXRjaGVyMSIsInVzZXJuYW1lIjoiZmxldGNoZXIxIiwiZW1haWwiOm51bGwsInBob25lIjoiKzg4MDE3NjIyMTQzMTUiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzM1ODA4MzAxLCJleHAiOjE3Mzg0MDAzMDF9.z13Ljw6pajyUHo_0VLKGyWsAOvV9S9yOUj7sdWG9PhQ"
   const appUserAuthToken2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl9GWTlURmZHbUlXIiwibmFtZSI6IkFsZmkgU2hhcmluIFJpenZpIiwidXNlcm5hbWUiOiJhc3JpenZpIiwiZW1haWwiOm51bGwsInBob25lIjoiKzg4MDE0MDgwMTY4NzQiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0Ijp0cnVlLCJpYXQiOjE3MzU4MDgyNzQsImV4cCI6MTczODQwMDI3NH0.q97T9czrcApPleAp0tyff3l63V12zMEuohP5sMp7D6c"
-  const blogUniqueId = 'blog_mcXDv11Aw3'
-  const commentUniqueId = 'cmt_R44u68XXdz'
+  const forumUniqueId = 'forum_txfGlyoRIm'
+  const commentUniqueId = 'cmt_bE05EtcYzW'
   const urlParams = new URLSearchParams(window.location.search);
   const userNo = urlParams.get('userNo'); // 'FIRST'|'SECOND'
 
@@ -23,12 +23,12 @@ function App() {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
       cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
       channelAuthorization: {
-        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL5 + `/${blogUniqueId}/user/${userNo === 'FIRST' ? appUserId : appUserId2}`
+        endpoint: import.meta.env.VITE_PUSHER_AUTH_BASE_URL6 + `/${forumUniqueId}/user/${userNo === 'FIRST' ? appUserId : appUserId2}`
       }
     });
 
     const pusherBindEvents = async () => {
-      var channel = pusherClient.subscribe(`presence-blog-${blogUniqueId}`);
+      var channel = pusherClient.subscribe(`presence-forum-${forumUniqueId}`);
   
       channel.bind("pusher:subscription_succeeded", (members) => {
         console.log('subscription_succeeded');
@@ -84,12 +84,12 @@ function App() {
     console.log(pusherClient);
     pusherBindEvents()
     return (() => {
-      pusherClient.unsubscribe(`presence-blog-${blogUniqueId}`)
+      pusherClient.unsubscribe(`presence-forum-${forumUniqueId}`)
     })
   }, [])
 
   const getAllComments = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL5 + `/app/blogs/${blogUniqueId}`, {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL5 + `/app/forums/${forumUniqueId}`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -98,33 +98,33 @@ function App() {
       }
     )
     const data = await response.json()
-    console.log('all blog messages', data.comments)
+    console.log('all forum messages', data.comments)
     setAllComments(data.comments)
   }
 
   const sendComment = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL5 + `/app/blogs/store-comment`, {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL5 + `/app/forums/store-comment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${userNo === 'FIRST' ? appUserAuthToken1 : appUserAuthToken2 }`
       },
 
-      body:JSON.stringify({ blogId: blogUniqueId, comments: messageToBeSent })
+      body:JSON.stringify({ forumId: forumUniqueId, comments: messageToBeSent })
     })
     setMessageToBeSent('')
     console.log('sent');
   }
 
   const sendReply = async () => {
-    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL5 + `/app/blogs/store-comment-reply`, {
+    const response = await fetch(import.meta.env.VITE_PUSHER_BASE_URL5 + `/app/forums/store-comment-reply`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${userNo === 'FIRST' ? appUserAuthToken1 : appUserAuthToken2 }`
       },
 
-      body:JSON.stringify({ blogId: blogUniqueId, commentId: commentUniqueId, comments: messageToBeSent })
+      body:JSON.stringify({ forumId: forumUniqueId, commentId: commentUniqueId, comments: messageToBeSent })
     })
     setMessageToBeSent('')
     console.log('sent');
