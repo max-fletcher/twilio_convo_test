@@ -60,20 +60,14 @@ function App() {
       });
       channel.bind("new-reply-submitted", (data) => {
         console.log('new-reply-submitted', data);
-
         setAllComments(prevComments => {
-          console.log(data.commentUniqueId)
           const comment = prevComments.find((comment) => {
-            console.log('looper', comment)
             return data.commentUniqueId === comment.uniqueId
           })
-          console.log('found comment', comment)
           if(comment && comment.replies && comment.replies.length)
             comment.replies = [...comment.replies, data]
           else
           comment.replies = [data]
-          console.log('uploaded comment', prevComments)
-          // return [...prevComments, data]
           return [...prevComments]
         })
       });
