@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Pusher from 'pusher-js';
 
-// PROFESSIONAL CHAT MULTIPLE CHANNEL
+// BIDS
 function App() {
   const [bids, setBids] = useState([])
   const [onlineCount, setOnlineCount] = useState(0)
