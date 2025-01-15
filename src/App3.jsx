@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Pusher from 'pusher-js';
 
-// PROFESSIONAL CHAT MULTIPLE CHANNEL
+// PROFESSIONAL CHAT MULTIPLE CHANNEL AND NOTIFICATIONS TEST
 function App() {
   const [messageToBeSent, setMessageToBeSent] = useState('')
   const [appUserMessages, setAppUserMessages] = useState([])
@@ -10,13 +10,13 @@ function App() {
   const [proChannel, setProChannel] = useState(null)
   const [userChannel, setUserChannel] = useState(null)
 
-  const appUserId = 'usr_56913465891340'
-  const professionalId = 'pro_hn9a8wdh89ahd'
+  const appUserId = 'usr_LljvtaQkYE'
+  const professionalId = 'pro_uTADPTyUQN'
   // const usertype = 'APPUSER' // 'APPUSER'|'PROFESSIONAL'
   const urlParams = new URLSearchParams(window.location.search);
   const usertype = urlParams.get('usertype'); // 'APPUSER'|'PROFESSIONAL'
-  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl81NjkxMzQ2NTg5MTM0MCIsIm5hbWUiOiJBZGFtIFNtaXRoMiIsInVzZXJuYW1lIjoiamhuc210aGJvaXMyIiwiZW1haWwiOiJtYWhpbi5jaG93ZGh1cnkuMTk5MUBnbWFpbC5jb20iLCJwaG9uZSI6Iis4ODAxNzYyMjE0MzE1Iiwid2hhdHNhcHBfbm8iOm51bGwsInZlcmlmaWVkIjp0cnVlLCJndWVzdCI6dHJ1ZSwiaWF0IjoxNzMzMzc5MjEzLCJleHAiOjE3MzU5NzEyMTN9.r7NDL12U5lf0eeaksBMzdmijN38jCG83r5qmALbUgwI"
-  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6InBybzFAbWFpbC5jb20iLCJpZCI6ImFkbV9iaDdhc2RnNzg5YSIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwicHJvZmVzc2lvbmFsSWQiOiJwcm9faG45YTh3ZGg4OWFoZCIsImlhdCI6MTczMzM3OTIwNSwiZXhwIjoxNzM1OTcxMjA1fQ.EnwByMRiX3avO5B_MxhoGkYjRMYrO6e-4drqm8aW_YI"
+  const appUserAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl9MbGp2dGFRa1lFIiwibmFtZSI6IkFuaXJ1ZGgiLCJ1c2VybmFtZSI6ImFubmkwMDciLCJlbWFpbCI6bnVsbCwicGhvbmUiOiIrODgwMTk0Njk3MzY0OCIsIndoYXRzYXBwX25vIjpudWxsLCJ2ZXJpZmllZCI6dHJ1ZSwiZ3Vlc3QiOmZhbHNlLCJpYXQiOjE3MzY5MzE2NjQsImV4cCI6MTczOTUyMzY2NH0.W6hPqIgvtrmGEalskxfCL_MgSLtCx40fAstkaLuyB5Q"
+  const proAuthToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ2YWx1ZSI6ImFuaXJ1ZGhhb250aWtAZ21haWwuY29tIiwiaWQiOiJhZG1fc1pZdlFJUEtYVCIsInVzZXJUeXBlIjoiUFJPRkVTU0lPTkFMIiwicHJvZmVzc2lvbmFsSWQiOiJwcm9fdVRBRFBUeVVRTiIsImlhdCI6MTczNjkzMTY2NywiZXhwIjoxNzM5NTIzNjY3fQ.FsCUs2Baqq6HtyU0kxrkUShj555qzALoXDTmLsW0hX8"
 
   useEffect(() => {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
@@ -79,6 +79,32 @@ function App() {
           // setAppUserMessages(prevMessages => [...prevMessages, data]) // FOR APP USERS
           setProMessages(prevMessages => [...prevMessages, data]) // FOR PROS
         });
+
+
+        const userNotificatonChannel = pusherClient.subscribe(`user-notification-${appUserId}`);
+        userNotificatonChannel.bind("pusher:subscription_succeeded", (members) => {
+          console.log('user channel all members details', members.count, members);
+          // LIST OF JOINED MEMBERS
+          // members.each((member) => {
+          //   console.log('member', member)
+          // });
+        });
+        userNotificatonChannel.bind("pusher:member_added", (member) => {
+          setStatusMessage(`${member.info.username} has joined the chat`)
+        });
+        userNotificatonChannel.bind("pusher:member_removed", (member) => {
+          setStatusMessage(`${member.info.username} has left the chat`)
+        });
+        userNotificatonChannel.bind("pusher:subscription_error", (data) => {
+          console.log('subscription_error', data)
+        });
+        userNotificatonChannel.bind(`recieve-notification`, (data) => {
+          console.log('recieve-notification', data);
+        });
+
+        console.log('userNotificatonChannel', userNotificatonChannel)
+
+
         setProChannel(proChannel)
         getMessagesForPro()
       }
