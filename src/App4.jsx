@@ -11,11 +11,10 @@ function App() {
   // const batchUniqueId = "batch_Bvqs24hBPL"
   // const appUserId = "usr_FY9TFfGmIW"
   // const appUserToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl9GWTlURmZHbUlXIiwibmFtZSI6IkFsZmkgU2hhcmluIFJpenZpIiwidXNlcm5hbWUiOiJhc3JpenZpIiwiZW1haWwiOm51bGwsInBob25lIjoiKzg4MDE0MDgwMTY4NzQiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0Ijp0cnVlLCJpYXQiOjE3MzQ0OTQ1MjAsImV4cCI6MTczNzA4NjUyMH0.6ZSrA_fQVjn6cBmkCVDePC9l7WVYo8yldOw1o6V_1Jw"
-
-  const auctionUniqueId = "auc_c2uRCqo6SD"
-  const batchUniqueId = "batch_Z4L3qV8QA3"
-  const appUserId = "usr_fCVMG9tzsa"
-  const appUserToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl9mQ1ZNRzl0enNhIiwibmFtZSI6Im1yIGdhemkiLCJ1c2VybmFtZSI6Im1hbXVuIiwiZW1haWwiOm51bGwsInBob25lIjoiKzg4MDE4NTg1NTMxODAiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzM0NjA1NjE2LCJleHAiOjE3MzcxOTc2MTZ9.O9hsVhDtQzDraI9GTkNIh2YfgLlTcExFM-VFp8MD6js"
+  const auctionUniqueId = "auc_VvWRsay1X0"
+  const batchUniqueId = "batch_4RyDO7pCvw"
+  const appUserId = "usr_H8cfj3itZH"
+  const appUserToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzcl9IOGNmajNpdFpIIiwibmFtZSI6Im1hbXVuIiwidXNlcm5hbWUiOiJnYXppIiwiZW1haWwiOm51bGwsInBob25lIjoiKzg4MDE4NTg1NTMxODAiLCJ3aGF0c2FwcF9ubyI6bnVsbCwidmVyaWZpZWQiOnRydWUsImd1ZXN0IjpmYWxzZSwiaWF0IjoxNzM4ODQyNzU5LCJleHAiOjE3NDE0MzQ3NTl9.BPJD3kgsOiYT-LHYgp4FGioZ6vmTrnJuyXThagfesyw"
 
   useEffect(() => {
     const pusherClient = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
@@ -54,6 +53,13 @@ function App() {
       channel.bind("bid-changed", (data) => {
         console.log('bid-changed', data)
         setBids(prevBids => [data, ...prevBids.filter(bid => bid.uniqueId !== data.replaceUniqueId)])
+      });
+
+      channel.bind("auction-status-changed", (data) => {
+        console.log('auction-status-changed', data)
+      });
+      channel.bind("user-joined", (data) => {
+        console.log('user-joined', data)
       });
     };
 
