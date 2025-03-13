@@ -10,6 +10,8 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const userNo = urlParams.get('userNo'); // 'FIRST'|'SECOND'
 
+  const amount = "100.00"
+
   useEffect(() => {
     console.log('userNo', userNo)
     console.log('henlo');
@@ -42,6 +44,42 @@ function App() {
   //   setMessageToBeSent('')
   //   console.log('sent');
   // }
+
+  const handlePayment = async (paymentData) => {
+    try {
+      console.log('load payment data', paymentData, paymentData.paymentMethodData.tokenizationData.token);
+      // Send the payment data to your server
+      const response = await fetch(`${import.meta.env.VITE_TIER_GPAY_BASE_URL}/test/process-payment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paymentData,
+          amount,
+        }),
+      });
+      
+      const result = await response.json();
+
+      if (result.success) {
+        handleSuccess(result)
+      } else {
+        handleError(result.error);
+      }
+    } catch (error) {
+      handleError(error.message);
+    }
+    
+  }
+
+  const handleSuccess = (data) => {
+    console.log('success', data)
+  }
+
+  const handleError = (error) => {
+    console.log('error', error)
+  }
 
   return (
     <>
@@ -76,14 +114,13 @@ function App() {
           transactionInfo: {
             totalPriceStatus: 'FINAL',
             totalPriceLabel: 'Total',
-            totalPrice: '100.00',
+            totalPrice: amount,
             currencyCode: 'USD',
             countryCode: 'US',
           },
         }}
-        onLoadPaymentData={paymentRequest => {
-          console.log('load payment data', paymentRequest);
-        }}
+        onLoadPaymentData={handlePayment}
+        onError={handleError}
       />
     </>
   )
