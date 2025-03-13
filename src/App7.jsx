@@ -47,7 +47,12 @@ function App() {
 
   const handlePayment = async (paymentData) => {
     try {
-      console.log('load payment data', paymentData, paymentData.paymentMethodData.tokenizationData.token);
+      console.log(
+        'paymentData', paymentData,
+        'token', JSON.parse(paymentData.paymentMethodData.tokenizationData.token)
+      );
+
+      const decodedToken = JSON.parse(paymentData.paymentMethodData.tokenizationData.token)
       // Send the payment data to your server
       const response = await fetch(`${import.meta.env.VITE_TIER_GPAY_BASE_URL}/test/process-payment`, {
         method: 'POST',
@@ -55,7 +60,10 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          paymentData,
+          signature: decodedToken.signature,
+          intermediateSigningKey: decodedToken.intermediateSigningKey,
+          protocolVersion: decodedToken.protocolVersion,
+          signedMessage: decodedToken.signedMessage,
           amount,
         }),
       });
@@ -101,8 +109,8 @@ function App() {
               tokenizationSpecification: {
                 type: 'PAYMENT_GATEWAY',
                 parameters: {
-                  gateway: 'example',
-                  gatewayMerchantId: 'exampleGatewayMerchantId',
+                  gateway: 'pinpayments',
+                  gatewayMerchantId: 'BCR2DN4T76CMV3DD',
                 },
               },
             },
