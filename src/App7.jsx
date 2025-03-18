@@ -78,7 +78,6 @@ function App() {
     } catch (error) {
       handleError(error.message);
     }
-    
   }
 
   const handleSuccess = (data) => {
