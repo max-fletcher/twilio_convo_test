@@ -9,14 +9,14 @@ function App() {
 
   const handleResponse = async (token) => {
     console.log('success', token)
-    setLoading(true)
+    // setLoading(true)
 
     const response = await fetch(`${import.meta.env.VITE_TIER_GPAY_BASE_URL}/test/process-payment`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ token: token.token, amount }),
+      body: JSON.stringify({ token: token, amount }),
     });
 
     const result = await response.json();
