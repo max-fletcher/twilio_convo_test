@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CreditCard, PaymentForm } from 'react-square-web-payments-sdk';
 
-// FORUM CHAT
+// TESTING SQUARE PAYMENT
 function App() {
   const [loading, setLoading] = useState(false)
 
@@ -23,10 +23,6 @@ function App() {
 
     console.log('result', result)
   }
-
-  // const handleError = (error) => {
-  //   console.log('error', error)
-  // }
 
   const applicationId = import.meta.env.VITE_SQUARE_APPLICATION_ID
   const locationId = import.meta.env.VITE_SQUARE_LOCATION_ID
