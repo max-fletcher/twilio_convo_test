@@ -10,7 +10,8 @@ import './index.css'
 // import App7 from './App7.jsx'
 // import App8 from './App8.jsx'
 // import App9 from './App9.jsx'
-import App10 from './App10.jsx'
+// import App10 from './App10.jsx'
+import App11 from './App11'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')).render(
     {/* <App7 /> */}
     {/* <App8 /> */}
     {/* <App9 /> */}
-    <App10 />
+    {/* <App10 /> */}\
+    <App11 />
   </StrictMode>,
 )
