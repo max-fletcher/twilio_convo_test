@@ -24,7 +24,7 @@ createRoot(document.getElementById('root')).render(
     {/* <App7 /> */}
     {/* <App8 /> */}
     {/* <App9 /> */}
-    {/* <App10 /> */}\
+    {/* <App10 /> */}
     <App11 />
   </StrictMode>,
 )

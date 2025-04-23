@@ -39,25 +39,33 @@ function App() {
 
   return (
     <>
-        <h1>Edu Content Purchase</h1>
+      <h1>Edu Content Purchase</h1>
 
-        <PaymentForm
-          applicationId={applicationId}
-          cardTokenizeResponseReceived={handleTierPurchase}
-          createVerificationDetails={() => ({
+      <PaymentForm
+        applicationId={applicationId}
+        cardTokenizeResponseReceived={handleTierPurchase}
+        createPaymentRequest={() => ({
+          countryCode: countryCode,
+          currencyCode: currencyCode,
+          total: {
             amount: amount,
-            billingContact: {
-              givenName: userName,
-              countryCode: countryCode,
-            },
+            label: "Total",
+          },
+        })}
+        createVerificationDetails={() => ({
+          amount: amount,
+          billingContact: {
+            givenName: userName,
             countryCode: countryCode,
-            currencyCode: currencyCode,
-            intent: 'CHARGE',
-          })}
-          locationId={locationId}
-        >
-          <ApplePay buttonProps={{ isLoading: loading }} />
-        </PaymentForm>
+          },
+          countryCode: countryCode,
+          currencyCode: currencyCode,
+          intent: 'CHARGE',
+        })}
+        locationId={locationId}
+      >
+        <ApplePay buttonProps={{ isLoading: loading }} />
+      </PaymentForm>
     </>
   )
 }
